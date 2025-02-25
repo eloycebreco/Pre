@@ -1,1 +1,65 @@
+import csv
+from datetime import datetime, timedelta
+
+CONTRACTS_FILE = 'contracts.csv'
+DATE_FORMAT = '%Y-%m-%d'
+
+# Crear un contrato
+def create_contract(numero, codigo, nombre_empresa, numero_contrato, tipo_contrato, fecha_inicio, fecha_vencimiento, suplemento, numero_suplemento, observaciones):
+    with open(CONTRACTS_FILE, 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([numero, codigo, nombre_empresa, numero_contrato, tipo_contrato, fecha_inicio, fecha_vencimiento, suplemento, numero_suplemento, observaciones])
+
+# Listar todos los contratos
+def list_contracts():
+    with open(CONTRACTS_FILE, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            print(row)
+
+# Listar contratos vigentes
+def list_active_contracts():
+    with open(CONTRACTS_FILE, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            numero, codigo, nombre_empresa, numero_contrato, tipo_contrato, fecha_inicio, fecha_vencimiento, suplemento, numero_suplemento, observaciones = row
+            fecha_vencimiento_obj = datetime.strptime(fecha_vencimiento, DATE_FORMAT)
+            if fecha_vencimiento_obj >= datetime.now():
+                print(row)
+
+# Listar contratos próximos a vencer
+def list_near_expiry_contracts():
+    with open(CONTRACTS_FILE, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            numero, codigo, nombre_empresa, numero_contrato, tipo_contrato, fecha_inicio, fecha_vencimiento, suplemento, numero_suplemento, observaciones = row
+            fecha_vencimiento_obj = datetime.strptime(fecha_vencimiento, DATE_FORMAT)
+            if timedelta(days=0) <= fecha_vencimiento_obj - datetime.now() <= timedelta(days=30):
+                print(row)
+
+# Listar contratos vencidos
+def list_expired_contracts():
+    with open(CONTRACTS_FILE, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            numero, codigo, nombre_empresa, numero_contrato, tipo_contrato, fecha_inicio, fecha_vencimiento, suplemento, numero_suplemento, observaciones = row
+            fecha_vencimiento_obj = datetime.strptime(fecha_vencimiento, DATE_FORMAT)
+            if fecha_vencimiento_obj < datetime.now():
+                print(row)
+
+# Ejemplos de uso
+create_contract('001', 'C-2024', 'Empresa A', '12345', 'Tipo 1', '2024-01-01', '2025-01-01', 'Sí', '001', 'Observaciones A')
+create_contract('002', 'C-2024', 'Empresa B', '67890', 'Tipo 2', '2024-02-01', '2025-02-01', 'No', '', 'Observaciones B')
+
+print("Todos los contratos:")
+list_contracts()
+
+print("Contratos vigentes:")
+list_active_contracts()
+
+print("Contratos próximos a vencerse:")
+list_near_expiry_contracts()
+
+print("Contratos vencidos:")
+list_expired_contracts()
 
